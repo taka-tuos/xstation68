@@ -1,0 +1,30 @@
+include ../Makefile.ref
+
+CC			= $(PREFIX)gcc
+AS			= $(PREFIX)as
+LD			= $(PREFIX)ld
+OBJCOPY		= $(PREFIX)objcopy
+
+default :
+	$(MAKE) $(TARGET).rom
+
+$(TARGET).rom : $(OBJS_TARGET) Makefile Makefile.in
+	$(MAKE) -C ../crt68
+	$(MAKE) -C ../golibc
+	$(LD) $(LFLAGS) -o $(TARGET).elf ../crt68/crt68.o $(OBJS_TARGET) ../golibc/golibc.a $(shell $(CC) -print-libgcc-file-name)
+	$(OBJCOPY) -O binary $(TARGET).elf $(TARGET).rom
+	$(MAKE) post
+
+clean :
+	$(MAKE) -C ../crt68 clean
+	$(MAKE) -C ../golibc clean
+	-rm *.elf
+	-rm *.o
+	-rm *.rom
+
+%.o : %.c Makefile Makefile.in
+	$(CC) $(CFLAGS) -o $*.o -c $*.c
+
+
+%.o : %.s Makefile Makefile.in
+	$(CC) $(CFLAGS) -o $*.o -c $*.s

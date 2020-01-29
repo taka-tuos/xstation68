@@ -1,0 +1,21 @@
+# default
+
+default :
+	$(MAKE) $(TARGET)
+
+# rules
+
+$(TARGET) : $(OBJS_TARGET) Makefile Makefile.in
+	$(CC) $(OBJS_TARGET) $(LIBS) -o $(TARGET)
+
+# normal rules
+
+%.o : %.c Makefile Makefile.in
+	$(CC) -c $(CFLAGS) -o $*.o $*.c
+
+# commands
+
+clean :
+	-rm *.o
+	-rm $(TARGET)
+	$(MAKE) additional_clean
